@@ -8,7 +8,8 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from PyQt5.QtGui import QIntValidator, QRegExpValidator
+from PyQt5.QtCore import QRegExp
 
 class Ui_Form(object):
     def setupUi(self, Form, processingObject):
@@ -17,16 +18,18 @@ class Ui_Form(object):
         self.device = self.asdu.interfaces[processingObject.processingInterfaceIndex].protocols[processingObject.processingProtocolIndex].devices[processingObject.processingDeviceIndex]
 
         Form.setObjectName("Form")
-        Form.resize(1366, 768)
+        
         font = QtGui.QFont()
         font.setPointSize(8)
         Form.setFont(font)
         Form.setStyleSheet("QWidget {\n"
 "    background-color: white;\n"
 "}")
+        Form.resizeEvent = lambda event: self.resizeEvent(event)
+        Form.closeEvent = lambda event: self.closeEvent(event, self.asdu)
         self.form = Form
         self.scrollArea = QtWidgets.QScrollArea(Form)
-        self.scrollArea.setGeometry(QtCore.QRect(0, 40, 1366, 728))
+        self.scrollArea.setGeometry(QtCore.QRect(0, 100, self.form.rect().width(), self.form.rect().height() - 100))
         self.scrollArea.setMinimumSize(QtCore.QSize(310, 380))
         self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
@@ -63,6 +66,22 @@ class Ui_Form(object):
         self.pushButton_4.setStyleSheet("QPushButton { border: none; border-top-left-radius: 5px; border-top-right-radius: 5px; background-color: transparent; }")
         self.pushButton_4.setObjectName("pushButton_4")
         self.pushButton_4.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.save = QtWidgets.QPushButton(Form)
+        self.save.setGeometry(QtCore.QRect(1000, 50, 155, 35))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.save.setFont(font)
+        self.save.setStyleSheet("QPushButton { border-radius: 5px; background-color: #FED2AA; }")
+        self.save.setObjectName("save")
+        self.save.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.cancel = QtWidgets.QPushButton(Form)
+        self.cancel.setGeometry(QtCore.QRect(800, 50, 155, 35))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.cancel.setFont(font)
+        self.cancel.setStyleSheet("QPushButton { border-radius: 5px; background-color: #C4C4C4; }")
+        self.cancel.setObjectName("cancel")
+        self.cancel.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.settingsRender()
 
         self.retranslateUi(Form)
@@ -70,7 +89,7 @@ class Ui_Form(object):
 
     def settingsRender(self):
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1366, 728))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, self.form.rect().width(), self.form.rect().height() - 100))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -80,7 +99,7 @@ class Ui_Form(object):
         self.groupBox.setFlat(True)
         self.groupBox.setObjectName("groupBox")
         self.line = QtWidgets.QFrame(self.groupBox)
-        self.line.setGeometry(QtCore.QRect(40, 285, 1286, 2))
+        self.line.setGeometry(QtCore.QRect(40, 245, 1286, 2))
         self.line.setStyleSheet("Line {\n"
 "    border: none;\n"
 "    background-color: #c4c4c4;\n"
@@ -89,7 +108,7 @@ class Ui_Form(object):
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line.setObjectName("line")
         self.frame_9 = QtWidgets.QFrame(self.groupBox)
-        self.frame_9.setGeometry(QtCore.QRect(40, 67, 531, 200))
+        self.frame_9.setGeometry(QtCore.QRect(40, 27, 531, 200))
         self.frame_9.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_9.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_9.setObjectName("frame_9")
@@ -132,7 +151,7 @@ class Ui_Form(object):
         self.cicleTransfer.setStyleSheet("QCheckBox { border: none; background-color: transparent; }")
         self.cicleTransfer.setObjectName("cicleTransfer")
         self.frame_10 = QtWidgets.QFrame(self.groupBox)
-        self.frame_10.setGeometry(QtCore.QRect(40, 290, 531, 150))
+        self.frame_10.setGeometry(QtCore.QRect(40, 250, 531, 150))
         self.frame_10.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_10.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_10.setObjectName("frame_10")
@@ -168,22 +187,6 @@ class Ui_Form(object):
         self.fastChanges.setFont(font)
         self.fastChanges.setStyleSheet("QCheckBox { border: none; background-color: transparent; }")
         self.fastChanges.setObjectName("fastChanges")
-        self.save = QtWidgets.QPushButton(self.groupBox)
-        self.save.setGeometry(QtCore.QRect(1000, 67, 155, 35))
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        self.save.setFont(font)
-        self.save.setStyleSheet("QPushButton { border-radius: 5px; background-color: #FED2AA; }")
-        self.save.setObjectName("save")
-        self.save.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.cancel = QtWidgets.QPushButton(self.groupBox)
-        self.cancel.setGeometry(QtCore.QRect(800, 67, 155, 35))
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        self.cancel.setFont(font)
-        self.cancel.setStyleSheet("QPushButton { border-radius: 5px; background-color: #C4C4C4; }")
-        self.cancel.setObjectName("cancel")
-        self.cancel.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.verticalLayout.addWidget(self.groupBox)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
@@ -204,11 +207,19 @@ class Ui_Form(object):
 
         for key in keyTypes:
                 if keyTypes[key] == "text":
+                        getattr(self, key).setValidator(QIntValidator(getattr(self, key).parent()))
                         getattr(self, key).setText(self.device.settings.get(key))
                         getattr(self, key).editingFinished.connect(self.editionCallback(key))
                 else:
                         getattr(self, key).setChecked(self.device.settings.get(key) or False)
                         getattr(self, key).stateChanged.connect(self.checkCallback(key))
+
+    def closeEvent(self, event, obj):
+        obj.cancel()
+
+    def resizeEvent(self, event):
+        self.scrollArea.setGeometry(QtCore.QRect(0, 100, self.form.rect().width(), self.form.rect().height() - 100))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, self.form.rect().width(), self.form.rect().height() - 100))
 
     def editionCallback(self, field):
         return lambda: self.updateDeviceText(field)

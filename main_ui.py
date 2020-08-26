@@ -14,6 +14,8 @@ from interface_settings import InterfaceSettings
 from model.ProcessingObject import ProcessingObject
 from model.Ethernet import EthernetBridge, Ethernet
 from devices_settings.mac_104_page import Mac104SettingsPage
+from PyQt5.QtGui import QIntValidator, QRegExpValidator
+from PyQt5.QtCore import QRegExp
 
 class Ui_Form(object):
     def readAsdu(self, asduName):
@@ -79,6 +81,7 @@ class Ui_Form(object):
         self.td = td
         self.asduNamePaths = {_translate("Form", k): './config/asdus/%s.yaml' % (k) for k in self.td.asduNames}
         self.processingObject = ProcessingObject(td)
+        self.ipRegExp = QRegExp("(\\d{1,3}\\.){3}\\d{1,3}")
 
         Form.setObjectName("Form")
         Form.resize(1366, 768)
@@ -114,32 +117,32 @@ class Ui_Form(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
 
-        self.save = QtWidgets.QPushButton(Form)
-        self.save.setGeometry(QtCore.QRect(56, 580, 271, 49))
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        self.save.setFont(font)
-        self.save.setStyleSheet("QPushButton { background-color: #FED2AA; border-radius: 7px; border: 0px; }")
-        self.save.setObjectName("save")
-        self.save.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        # self.save = QtWidgets.QPushButton(Form)
+        # self.save.setGeometry(QtCore.QRect(56, 580, 271, 49))
+        # font = QtGui.QFont()
+        # font.setPointSize(11)
+        # self.save.setFont(font)
+        # self.save.setStyleSheet("QPushButton { background-color: #FED2AA; border-radius: 7px; border: 0px; }")
+        # self.save.setObjectName("save")
+        # self.save.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
-        self.cancel = QtWidgets.QPushButton(Form)
-        self.cancel.setGeometry(QtCore.QRect(56, 640, 271, 49))
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        self.cancel.setFont(font)
-        self.cancel.setStyleSheet("QPushButton { background-color: #e5e5e5; border-radius: 7px; border: 0px; }")
-        self.cancel.setObjectName("cancel")
-        self.cancel.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        # self.cancel = QtWidgets.QPushButton(Form)
+        # self.cancel.setGeometry(QtCore.QRect(56, 640, 271, 49))
+        # font = QtGui.QFont()
+        # font.setPointSize(11)
+        # self.cancel.setFont(font)
+        # self.cancel.setStyleSheet("QPushButton { background-color: #e5e5e5; border-radius: 7px; border: 0px; }")
+        # self.cancel.setObjectName("cancel")
+        # self.cancel.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
 
-        self.openFile = QtWidgets.QPushButton(Form)
-        self.openFile.setGeometry(QtCore.QRect(56, 700, 271, 49))
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        self.openFile.setFont(font)
-        self.openFile.setStyleSheet("QPushButton { background-color: #f0f0f0; border-radius: 7px; border: 1px solid #c4c4c4; }")
-        self.openFile.setObjectName("openFile")
-        self.openFile.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        # self.openFile = QtWidgets.QPushButton(Form)
+        # self.openFile.setGeometry(QtCore.QRect(56, 700, 271, 49))
+        # font = QtGui.QFont()
+        # font.setPointSize(11)
+        # self.openFile.setFont(font)
+        # self.openFile.setStyleSheet("QPushButton { background-color: #f0f0f0; border-radius: 7px; border: 1px solid #c4c4c4; }")
+        # self.openFile.setObjectName("openFile")
+        # self.openFile.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.readAsdu(list(self.asduNamePaths)[0])
 
         self.retranslateUi(Form)
@@ -167,30 +170,40 @@ class Ui_Form(object):
                 ref_frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
                 ref_frame.setFrameShadow(QtWidgets.QFrame.Raised)
                 ref_frame.setObjectName("ref_%s" % (i))
-
-                ref_label = QtWidgets.QLabel(ref_frame)
-                ref_label.setGeometry(QtCore.QRect(0, 0, 111, 30))
-                font = QtGui.QFont()
-                font.setPointSize(11)
-                ref_label.setFont(font)
-                ref_label.setObjectName("ref_label_%s" % (i))
-                ref_label.setText(_translate("Form", self.currentASDU.interfaces[i].name))
-
-                ref_button = QtWidgets.QPushButton(ref_frame)
-                ref_button.setGeometry(QtCore.QRect(111, 0, 105, 30))
-                font = QtGui.QFont()
-                font.setPointSize(10)
-                ref_button.setFont(font)
-                ref_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-                ref_button.setStyleSheet("QPushButton { background-color: #FED2AA; border: none; border-radius: 5px; }")
-                ref_button.setObjectName("ref_button_%s" % (i))
-                ref_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-                ref_button.setText(_translate("Form", "Настроить"))
-                ref_button.clicked.connect(self.clickedEvent(i))
-
                 setattr(self, "ref_%s" % (i), ref_frame)
-                setattr(self, "ref_label_%s" % (i), ref_label)
-                setattr(self, "ref_button_%s" % (i), ref_button)
+
+                if self.interfaceType == 'RS-485' and i == startIndex:
+                        ref_label = QtWidgets.QLabel(ref_frame)
+                        ref_label.setGeometry(QtCore.QRect(0, 0, 220, 30))
+                        font = QtGui.QFont()
+                        font.setPointSize(11)
+                        ref_label.setFont(font)
+                        ref_label.setObjectName("ref_label_%s" % (i))
+                        ref_label.setText(_translate("Form", self.currentASDU.interfaces[i].name + " зарезервирован АСКУЭ"))
+                        setattr(self, "ref_label_%s" % (i), ref_label)
+                else:
+                        ref_label = QtWidgets.QLabel(ref_frame)
+                        ref_label.setGeometry(QtCore.QRect(0, 0, 111, 30))
+                        font = QtGui.QFont()
+                        font.setPointSize(11)
+                        ref_label.setFont(font)
+                        ref_label.setObjectName("ref_label_%s" % (i))
+                        ref_label.setText(_translate("Form", self.currentASDU.interfaces[i].name))
+
+                        ref_button = QtWidgets.QPushButton(ref_frame)
+                        ref_button.setGeometry(QtCore.QRect(111, 0, 105, 30))
+                        font = QtGui.QFont()
+                        font.setPointSize(10)
+                        ref_button.setFont(font)
+                        ref_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+                        ref_button.setStyleSheet("QPushButton { background-color: #FED2AA; border: none; border-radius: 5px; }")
+                        ref_button.setObjectName("ref_button_%s" % (i))
+                        ref_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+                        ref_button.setText(_translate("Form", "Настроить"))
+                        ref_button.clicked.connect(self.clickedEvent(i))
+
+                        setattr(self, "ref_label_%s" % (i), ref_label)
+                        setattr(self, "ref_button_%s" % (i), ref_button)
                 
                 if (i - startIndex) % 2 == 1:
                         y += 50
@@ -553,7 +566,9 @@ class Ui_Form(object):
     def openInterfaceSettings(self, n):
         if self.interfaceType != "CAN":
                 self.processingObject.processingInterfaceIndex = n
+                self.processingObject.processTcpClient = False
                 window = QtWidgets.QWidget()
+                window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
                 self.interfaceSettings = InterfaceSettings(window, self.processingObject)
                 window.show()
 
@@ -1344,6 +1359,12 @@ class Ui_Form(object):
                         ethernetObject = getattr(bridge, ethernetName)
 
                         if prop not in ["dhcp", "snmp", "netBIOS"]:
+                                if prop != "asduName":
+                                        if prop not in ["ttl", "maxMTU"]:
+                                                ethernetInput.setValidator(QRegExpValidator(self.ipRegExp, ethernetInput.parent()))
+                                        else:
+                                                ethernetInput.setValidator(QIntValidator(ethernetInput.parent()))
+                                
                                 ethernetInput.setText(_translate("Form", ethernetObject.settings.get(prop)))
                                 ethernetInput.editingFinished.connect(self.editingFinishedConnect(ethernetObject, prop, ethernetInput))
                         else:
@@ -1354,6 +1375,7 @@ class Ui_Form(object):
                 reservationInput = getattr(self, "reservation_%s" % (prop))
                 reservationInput.setText(_translate("Form", bridge.reservationSettings.settings.get(prop)))
                 reservationInput.editingFinished.connect(self.editingFinishedConnect(bridge.reservationSettings, prop, reservationInput))
+                reservationInput.setValidator(QIntValidator(ethernetInput.parent()))
 
     def stateChangedConnect(self, ethernet, prop, checkBox):
         return lambda: self.setSettingState(ethernet, prop, checkBox)
@@ -1579,6 +1601,11 @@ class Ui_Form(object):
                         propertyType = propertyTypes[propertyName]
                         propertyInput = getattr(self, propertySavedPropertyNames[propertyName] % (i + 1))
                         if propertyType == 'text':
+                                if propertyName == "ip":
+                                        propertyInput.setValidator(QRegExpValidator(self.ipRegExp, propertyInput.parent()))
+                                else:
+                                        propertyInput.setValidator(QIntValidator(propertyInput.parent()))
+                                
                                 propertyInput.setText(getattr(self.td.tcpClients[i], propertyName))
                                 propertyInput.editingFinished.connect(self.tcpClientEditingFinishedConnect(self.td.tcpClients[i], propertyName, propertyInput))
                         elif propertyType == "selector":
@@ -1936,6 +1963,12 @@ class Ui_Form(object):
                 ethernetInput = getattr(self, "ethernet_%s" % (prop))
                                 
                 if prop not in ["dhcp", "snmp", "netBIOS"]:
+                        if prop != "asduName":
+                                if prop not in ["ttl", "maxMTU"]:
+                                        ethernetInput.setValidator(QRegExpValidator(self.ipRegExp, ethernetInput.parent()))
+                                else:
+                                        ethernetInput.setValidator(QIntValidator(ethernetInput.parent()))
+                        
                         ethernetInput.setText(_translate("Form", ethernet.settings.get(prop)))
                         ethernetInput.editingFinished.connect(self.editingFinishedConnect(ethernet, prop, ethernetInput))
                 else:
@@ -1946,6 +1979,6 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Telemechanics"))
         self.label_8.setText(_translate("Form", "Интерфейсы:"))
-        self.save.setText(_translate("Form", "Сохранить"))
-        self.cancel.setText(_translate("Form", "Отмена"))
-        self.openFile.setText(_translate("Form", "Открыть файл"))
+        # self.save.setText(_translate("Form", "Сохранить"))
+        # self.cancel.setText(_translate("Form", "Отмена"))
+        # self.openFile.setText(_translate("Form", "Открыть файл"))

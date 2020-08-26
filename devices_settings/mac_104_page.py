@@ -16,25 +16,35 @@ class Mac104TablePage(mac_104_table.Ui_Form):
     def connectSlots(self):
         self.pushButton.clicked.connect(self.openSettings)
         self.pushButton_8.clicked.connect(self.openTimeouts)
-        self.save.clicked.connect(lambda: self.asdu.save(self.form))
+        self.save.clicked.connect(self.saveSlot)
         self.cancel.clicked.connect(self.cancelSlot)
 
-    def cancelSlot(self):
-        self.asdu.cancel()
-        self.device = self.getDevice()
+    def saveSlot(self):
+        if self.processingObject.processTcpClient:
+            self.td.forceSave()
+        else:
+            self.asdu.save(self.form)
+        
+        self.form.hide()
 
-        for child in self.scrollAreaWidgetContents.children():
-            child.deleteLater()
-        self.settingsRender()
+    def cancelSlot(self):
+        if self.processingObject.processTcpClient:
+            self.td.cancel()
+        else:
+            self.asdu.cancel()
+        
+        self.form.hide()
 
     def openSettings(self):
         window = QWidget()
+        window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
         self.settings = Mac104SettingsPage(window, self.processingObject)
         window.show()
         self.form.hide()
 
     def openTimeouts(self):
         window = QWidget()
+        window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
         self.timeouts = Mac104TimeoutsPage(window, self.processingObject)
         window.show()
         self.form.hide()
@@ -53,25 +63,35 @@ class Mac104SettingsPage(mac_104_settings.Ui_Form):
     def connectSlots(self):
         self.pushButton_2.clicked.connect(self.openTable)
         self.pushButton_4.clicked.connect(self.openTimeouts)
-        self.save.clicked.connect(lambda: self.asdu.save(self.form))
+        self.save.clicked.connect(self.saveSlot)
         self.cancel.clicked.connect(self.cancelSlot)
 
-    def cancelSlot(self):
-        self.asdu.cancel()
-        self.device = self.getDevice()
+    def saveSlot(self):
+        if self.processingObject.processTcpClient:
+            self.td.forceSave()
+        else:
+            self.asdu.save(self.form)
+        
+        self.form.hide()
 
-        for child in self.scrollAreaWidgetContents.children():
-            child.deleteLater()
-        self.settingsRender()
+    def cancelSlot(self):
+        if self.processingObject.processTcpClient:
+            self.td.cancel()
+        else:
+            self.asdu.cancel()
+
+        self.form.hide()
 
     def openTable(self):
         window = QWidget()
+        window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
         self.table = Mac104TablePage(window, self.processingObject)
         window.show()
         self.form.hide()
 
     def openTimeouts(self):
         window = QWidget()
+        window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
         self.timeouts = Mac104TimeoutsPage(window, self.processingObject)
         window.show()
         self.form.hide()
@@ -91,25 +111,35 @@ class Mac104TimeoutsPage(mac_104_timeouts.Ui_Form):
     def connectSlots(self):
         self.pushButton_2.clicked.connect(self.openTable)
         self.pushButton.clicked.connect(self.openSettings)
-        self.save.clicked.connect(lambda: self.asdu.save(self.form))
+        self.save.clicked.connect(self.saveSlot)
         self.cancel.clicked.connect(self.cancelSlot)
 
-    def cancelSlot(self):
-        self.asdu.cancel()
-        self.device = self.getDevice()
+    def saveSlot(self):
+        if self.processingObject.processTcpClient:
+            self.td.forceSave()
+        else:
+            self.asdu.save(self.form)
+        
+        self.form.hide()
 
-        for child in self.scrollAreaWidgetContents.children():
-            child.deleteLater()
-        self.timeoutsRender()
+    def cancelSlot(self):
+        if self.processingObject.processTcpClient:
+            self.td.cancel()
+        else:
+            self.asdu.cancel()
+        
+        self.form.hide()
 
     def openTable(self):
         window = QWidget()
+        window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
         self.table = Mac104TablePage(window, self.processingObject)
         window.show()
         self.form.hide()
 
     def openSettings(self):
         window = QWidget()
+        window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
         self.settings = Mac104SettingsPage(window, self.processingObject)
         window.show()
         self.form.hide()

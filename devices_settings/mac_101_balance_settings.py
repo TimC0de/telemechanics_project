@@ -8,7 +8,8 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from PyQt5.QtGui import QIntValidator, QRegExpValidator
+from PyQt5.QtCore import QRegExp
 
 class Ui_Form(object):
     def setupUi(self, Form, processingObject):
@@ -17,13 +18,15 @@ class Ui_Form(object):
         self.device = self.asdu.interfaces[processingObject.processingInterfaceIndex].protocols[processingObject.processingProtocolIndex].devices[processingObject.processingDeviceIndex]
 
         Form.setObjectName("Form")
-        Form.resize(1366, 768)
+        
         font = QtGui.QFont()
         font.setPointSize(8)
         Form.setFont(font)
         Form.setStyleSheet("QWidget {\n"
 "    background-color: white;\n"
 "}")
+        Form.resizeEvent = lambda event: self.resizeEvent(event)
+        Form.closeEvent = lambda event: self.closeEvent(event, self.asdu)
         self.form = Form
         self.frame_8 = QtWidgets.QFrame(Form)
         self.frame_8.setGeometry(QtCore.QRect(0, 0, 1440, 40))
@@ -48,12 +51,28 @@ class Ui_Form(object):
         self.pushButton_2.setObjectName("pushButton_2")
         self.pushButton_2.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.scrollArea = QtWidgets.QScrollArea(Form)
-        self.scrollArea.setGeometry(QtCore.QRect(0, 40, 1366, 728))
+        self.scrollArea.setGeometry(QtCore.QRect(0, 100, self.form.rect().width(), self.form.rect().height() - 100))
         self.scrollArea.setMinimumSize(QtCore.QSize(1366, 728))
         self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.scrollArea.setStyleSheet("QScrollArea { border: none; }")
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
+        self.save = QtWidgets.QPushButton(Form)
+        self.save.setGeometry(QtCore.QRect(1000, 50, 155, 35))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.save.setFont(font)
+        self.save.setStyleSheet("QPushButton { border-radius: 5px; background-color: #FED2AA; }")
+        self.save.setObjectName("save")
+        self.save.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.cancel = QtWidgets.QPushButton(Form)
+        self.cancel.setGeometry(QtCore.QRect(800, 50, 155, 35))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.cancel.setFont(font)
+        self.cancel.setStyleSheet("QPushButton { border-radius: 5px; background-color: #C4C4C4; }")
+        self.cancel.setObjectName("cancel")
+        self.cancel.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.settingsRender()
 
         _translate = QtCore.QCoreApplication.translate
@@ -63,7 +82,7 @@ class Ui_Form(object):
         
     def settingsRender(self):
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1366, 728))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, self.form.rect().width(), self.form.rect().height() - 100))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -73,7 +92,7 @@ class Ui_Form(object):
         self.groupBox.setFlat(True)
         self.groupBox.setObjectName("groupBox")
         self.line = QtWidgets.QFrame(self.groupBox)
-        self.line.setGeometry(QtCore.QRect(40, 285, 1360, 2))
+        self.line.setGeometry(QtCore.QRect(40, 245, 1360, 2))
         self.line.setStyleSheet("Line {\n"
 "    border: none;\n"
 "    background-color: #c4c4c4;\n"
@@ -82,7 +101,7 @@ class Ui_Form(object):
         self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line.setObjectName("line")
         self.frame_9 = QtWidgets.QFrame(self.groupBox)
-        self.frame_9.setGeometry(QtCore.QRect(40, 67, 380, 200))
+        self.frame_9.setGeometry(QtCore.QRect(40, 27, 380, 200))
         self.frame_9.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_9.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_9.setObjectName("frame_9")
@@ -125,7 +144,7 @@ class Ui_Form(object):
         self.allowSync.setStyleSheet("QCheckBox { border: none; background-color: transparent; }")
         self.allowSync.setObjectName("allowSync")
         self.frame_10 = QtWidgets.QFrame(self.groupBox)
-        self.frame_10.setGeometry(QtCore.QRect(40, 290, 531, 150))
+        self.frame_10.setGeometry(QtCore.QRect(40, 250, 531, 150))
         self.frame_10.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_10.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_10.setObjectName("frame_10")
@@ -162,7 +181,7 @@ class Ui_Form(object):
         self.fastChanges.setStyleSheet("QCheckBox { border: none; background-color: transparent; }")
         self.fastChanges.setObjectName("fastChanges")
         self.frame_11 = QtWidgets.QFrame(self.groupBox)
-        self.frame_11.setGeometry(QtCore.QRect(712, 290, 531, 150))
+        self.frame_11.setGeometry(QtCore.QRect(712, 250, 531, 150))
         self.frame_11.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_11.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_11.setObjectName("frame_11")
@@ -199,7 +218,7 @@ class Ui_Form(object):
         self.sporadic.setStyleSheet("QCheckBox { border: none; background-color: transparent; }")
         self.sporadic.setObjectName("sporadic")
         self.line_2 = QtWidgets.QFrame(self.groupBox)
-        self.line_2.setGeometry(QtCore.QRect(40, 475, 1360, 2))
+        self.line_2.setGeometry(QtCore.QRect(40, 435, 1360, 2))
         self.line_2.setStyleSheet("Line {\n"
 "    border: none;\n"
 "    background-color: #c4c4c4;\n"
@@ -208,7 +227,7 @@ class Ui_Form(object):
         self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_2.setObjectName("line_2")
         self.frame_12 = QtWidgets.QFrame(self.groupBox)
-        self.frame_12.setGeometry(QtCore.QRect(712, 480, 531, 160))
+        self.frame_12.setGeometry(QtCore.QRect(712, 440, 531, 160))
         self.frame_12.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_12.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_12.setObjectName("frame_12")
@@ -251,7 +270,7 @@ class Ui_Form(object):
         self.period.setStyleSheet("QLineEdit { border: 1px solid #aaaaaa; }")
         self.period.setObjectName("period")
         self.frame_13 = QtWidgets.QFrame(self.groupBox)
-        self.frame_13.setGeometry(QtCore.QRect(40, 480, 531, 160))
+        self.frame_13.setGeometry(QtCore.QRect(40, 440, 531, 160))
         self.frame_13.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_13.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_13.setObjectName("frame_13")
@@ -288,7 +307,7 @@ class Ui_Form(object):
         self.bit4.setStyleSheet("QCheckBox { border: none; background-color: transparent; }")
         self.bit4.setObjectName("bit4")
         self.frame_14 = QtWidgets.QFrame(self.groupBox)
-        self.frame_14.setGeometry(QtCore.QRect(40, 685, 531, 160))
+        self.frame_14.setGeometry(QtCore.QRect(40, 645, 531, 160))
         self.frame_14.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_14.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_14.setObjectName("frame_14")
@@ -325,7 +344,7 @@ class Ui_Form(object):
         self.st121.setStyleSheet("QCheckBox { border: none; background-color: transparent; }")
         self.st121.setObjectName("st121")
         self.line_3 = QtWidgets.QFrame(self.groupBox)
-        self.line_3.setGeometry(QtCore.QRect(40, 680, 1360, 2))
+        self.line_3.setGeometry(QtCore.QRect(40, 640, 1360, 2))
         self.line_3.setStyleSheet("Line {\n"
 "    border: none;\n"
 "    background-color: #c4c4c4;\n"
@@ -333,22 +352,6 @@ class Ui_Form(object):
         self.line_3.setFrameShape(QtWidgets.QFrame.HLine)
         self.line_3.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_3.setObjectName("line_3")
-        self.save = QtWidgets.QPushButton(self.groupBox)
-        self.save.setGeometry(QtCore.QRect(1000, 67, 155, 35))
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        self.save.setFont(font)
-        self.save.setStyleSheet("QPushButton { border-radius: 5px; background-color: #FED2AA; }")
-        self.save.setObjectName("save")
-        self.save.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.cancel = QtWidgets.QPushButton(self.groupBox)
-        self.cancel.setGeometry(QtCore.QRect(800, 67, 155, 35))
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        self.cancel.setFont(font)
-        self.cancel.setStyleSheet("QPushButton { border-radius: 5px; background-color: #C4C4C4; }")
-        self.cancel.setObjectName("cancel")
-        self.cancel.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.verticalLayout.addWidget(self.groupBox)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
@@ -371,8 +374,6 @@ class Ui_Form(object):
         self.label_13.setText(_translate("Form", "Структура блока данных"))
         self.st232.setText(_translate("Form", "232"))
         self.st121.setText(_translate("Form", "121"))
-        self.save.setText(_translate("Form", "Сохранить"))
-        self.cancel.setText(_translate("Form", "Отмена"))
 
         keyTypes = {"asduAddress": "text",
          "allowSync": "boolean",
@@ -389,11 +390,19 @@ class Ui_Form(object):
 
         for key in keyTypes:
                 if keyTypes[key] == "text":
+                        getattr(self, key).setValidator(QIntValidator(getattr(self, key).parent()))
                         getattr(self, "%s" % (key)).setText(self.device.settings.get(key))
                         getattr(self, "%s" % (key)).editingFinished.connect(self.editionCallback(key))
                 else:
                         getattr(self, "%s" % (key)).setChecked(self.device.settings.get(key) or False)
                         getattr(self, "%s" % (key)).stateChanged.connect(self.checkCallback(key))
+    
+    def closeEvent(self, event, obj):
+        obj.cancel()
+
+    def resizeEvent(self, event):
+        self.scrollArea.setGeometry(QtCore.QRect(0, 100, self.form.rect().width(), self.form.rect().height() - 100))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, self.form.rect().width(), self.form.rect().height() - 100))
 
     def editionCallback(self, field):
         return lambda: self.updateDeviceText(field)
@@ -412,3 +421,5 @@ class Ui_Form(object):
         Form.setWindowTitle(_translate("Form", self.device.name))
         self.pushButton.setText(_translate("Form", "Настройки"))
         self.pushButton_2.setText(_translate("Form", "Таблица"))
+        self.save.setText(_translate("Form", "Сохранить"))
+        self.cancel.setText(_translate("Form", "Отмена"))

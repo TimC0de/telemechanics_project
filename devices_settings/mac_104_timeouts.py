@@ -8,31 +8,35 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from PyQt5.QtGui import QIntValidator, QRegExpValidator
+from PyQt5.QtCore import QRegExp
 
 class Ui_Form(object):
     def getDevice(self):
         if self.processingObject.processTcpClient:
-            return self.asdu.tcpClients[self.processingObject.processingTcpClientIndex]
+            return self.td.tcpClients[self.processingObject.processingTcpClientIndex]
         else:
             return self.asdu.interfaces[self.processingObject.processingInterfaceIndex].protocols[self.processingObject.processingProtocolIndex].devices[self.processingObject.processingDeviceIndex]
     
     def setupUi(self, Form, processingObject):
         self.processingObject = processingObject
+        self.td = processingObject.td
         self.asdu = processingObject.asdu
         self.device = self.getDevice()
 
         Form.setObjectName("Form")
-        Form.resize(1366, 768)
+        
         font = QtGui.QFont()
         font.setPointSize(8)
         Form.setFont(font)
         Form.setStyleSheet("QWidget {\n"
 "    background-color: white;\n"
 "}")
+        Form.resizeEvent = lambda event: self.resizeEvent(event)
+        Form.closeEvent = lambda event: self.closeEvent(event, self.asdu)
         self.form = Form
         self.scrollArea = QtWidgets.QScrollArea(Form)
-        self.scrollArea.setGeometry(QtCore.QRect(0, 40, 1366, 728))
+        self.scrollArea.setGeometry(QtCore.QRect(0, 100, self.form.rect().width(), self.form.rect().height() - 100))
         self.scrollArea.setMinimumSize(QtCore.QSize(1366, 728))
         self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.scrollArea.setStyleSheet("QScrollArea { border: none; }")
@@ -68,14 +72,31 @@ class Ui_Form(object):
         self.pushButton_8.setStyleSheet("QPushButton { border: none; border-top-left-radius: 5px; border-top-right-radius: 5px; }")
         self.pushButton_8.setObjectName("pushButton_8")
         self.pushButton_8.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.save = QtWidgets.QPushButton(Form)
+        self.save.setGeometry(QtCore.QRect(1000, 67, 155, 35))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.save.setFont(font)
+        self.save.setStyleSheet("QPushButton { border-radius: 5px; background-color: #FED2AA; }")
+        self.save.setObjectName("save")
+        self.save.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.cancel = QtWidgets.QPushButton(Form)
+        self.cancel.setGeometry(QtCore.QRect(800, 67, 155, 35))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.cancel.setFont(font)
+        self.cancel.setStyleSheet("QPushButton { border-radius: 5px; background-color: #C4C4C4; }")
+        self.cancel.setObjectName("cancel")
+        self.cancel.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.timeoutsRender()
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
     
     def timeoutsRender(self):
+        _translate = QtCore.QCoreApplication.translate
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1366, 728))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, self.form.rect().width(), self.form.rect().height() - 100))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -186,28 +207,29 @@ class Ui_Form(object):
         font.setPointSize(11)
         self.label_4.setFont(font)
         self.label_4.setObjectName("label_4")
-        self.save = QtWidgets.QPushButton(self.groupBox)
-        self.save.setGeometry(QtCore.QRect(1000, 67, 155, 35))
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        self.save.setFont(font)
-        self.save.setStyleSheet("QPushButton { border-radius: 5px; background-color: #FED2AA; }")
-        self.save.setObjectName("save")
-        self.save.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.cancel = QtWidgets.QPushButton(self.groupBox)
-        self.cancel.setGeometry(QtCore.QRect(800, 67, 155, 35))
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        self.cancel.setFont(font)
-        self.cancel.setStyleSheet("QPushButton { border-radius: 5px; background-color: #C4C4C4; }")
-        self.cancel.setObjectName("cancel")
-        self.cancel.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.verticalLayout.addWidget(self.groupBox)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
+        self.label_8.setText(_translate("Form", "МЭК 104 (%s)" % (self.device.name)))
+        self.label_15.setText(_translate("Form", "t1,с:"))
+        self.label_16.setText(_translate("Form", "t2,с:"))
+        self.label_17.setText(_translate("Form", "t3,с:"))
+        self.label.setText(_translate("Form", "К"))
+        self.label_2.setText(_translate("Form", "1"))
+        self.label_3.setText(_translate("Form", "W"))
+        self.label_4.setText(_translate("Form", "1"))
+
         for tEdit in ["t1", "t2", "t3"]:
+            getattr(self, tEdit).setValidator(QIntValidator(getattr(self, tEdit).parent()))
             getattr(self, tEdit).setText(self.device.settings.get(tEdit))
             getattr(self, tEdit).editingFinished.connect(self.editionCallback(tEdit))
+
+    def closeEvent(self, event, obj):
+        obj.cancel()
+
+    def resizeEvent(self, event):
+        self.scrollArea.setGeometry(QtCore.QRect(0, 100, self.form.rect().width(), self.form.rect().height() - 100))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, self.form.rect().width(), self.form.rect().height() - 100))
 
     def editionCallback(self, field):
         return lambda: self.updateDeviceText(field)
@@ -221,13 +243,5 @@ class Ui_Form(object):
         self.pushButton.setText(_translate("Form", "Настройки"))
         self.pushButton_2.setText(_translate("Form", "Данные"))
         self.pushButton_8.setText(_translate("Form", "Тайм-ауты"))
-        self.label_8.setText(_translate("Form", "МЭК 104 (%s)" % (self.device.name)))
-        self.label_15.setText(_translate("Form", "t1,с:"))
-        self.label_16.setText(_translate("Form", "t2,с:"))
-        self.label_17.setText(_translate("Form", "t3,с:"))
-        self.label.setText(_translate("Form", "К"))
-        self.label_2.setText(_translate("Form", "1"))
-        self.label_3.setText(_translate("Form", "W"))
-        self.label_4.setText(_translate("Form", "1"))
         self.save.setText(_translate("Form", "Сохранить"))
         self.cancel.setText(_translate("Form", "Отмена"))

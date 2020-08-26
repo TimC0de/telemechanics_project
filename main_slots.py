@@ -18,9 +18,12 @@ class MainPageSlots(Ui_Form):
         self._translate = QtCore.QCoreApplication.translate
 
         # Save settings
-        self.save.clicked.connect(lambda: self.currentASDU.save(self.form, mainPage=True))
-        self.cancel.clicked.connect(self.cancelSlot)
-        self.openFile.clicked.connect(self.openConfigFile)
+        # self.save.clicked.connect(self.saveSlot)
+        # self.cancel.clicked.connect(self.cancelSlot)
+        # self.openFile.clicked.connect(self.openConfigFile)
+
+    def saveSlot(self):
+        self.currentASDU.save(self.form, mainPage=True)
 
     def cancelSlot(self):
         self.currentASDU.cancel()

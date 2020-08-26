@@ -3,9 +3,20 @@ import yaml
 import config_util
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox
 from main_slots import MainPageSlots
 from model.TelemechanicsData import TelemechanicsData
+
+def log_uncaught_exceptions(ex_cls, ex, tb):
+    text = '{}: {}:\n'.format(ex_cls.__name__, ex)
+    import traceback
+    text += ''.join(traceback.format_tb(tb))
+
+    print(text)
+    QMessageBox.critical(None, 'Error', text)
+    quit()
+
+sys.excepthook = log_uncaught_exceptions
 
 class MainWindow(MainPageSlots):
     

@@ -15,19 +15,20 @@ class Mac101BalanceTablePage(mac_101_balance_table.Ui_Form):
 
     def connectSlots(self):
         self.pushButton.clicked.connect(self.openSettings)
-        self.save.clicked.connect(lambda: self.asdu.save(self.form))
+        self.save.clicked.connect(self.saveSlot)
         self.cancel.clicked.connect(self.cancelSlot)
+
+    def saveSlot(self):
+        self.asdu.save(self.form)
+        self.form.hide()
 
     def cancelSlot(self):
         self.asdu.cancel()
-        self.device = self.asdu.interfaces[self.processingObject.processingInterfaceIndex].protocols[self.processingObject.processingProtocolIndex].devices[self.processingObject.processingDeviceIndex]
-
-        for child in self.scrollAreaWidgetContents.children():
-            child.deleteLater()
-        self.settingsRender()
+        self.form.hide()
 
     def openSettings(self):
         window = QWidget()
+        window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
         self.settings = Mac101BalanceSettingsPage(window, self.processingObject)
         window.show()
         self.form.hide()
@@ -45,19 +46,20 @@ class Mac101BalanceSettingsPage(mac_101_balance_settings.Ui_Form):
 
     def connectSlots(self):
         self.pushButton_2.clicked.connect(self.openTable)
-        self.save.clicked.connect(lambda: self.asdu.save(self.form))
+        self.save.clicked.connect(self.saveSlot)
         self.cancel.clicked.connect(self.cancelSlot)
+
+    def saveSlot(self):
+        self.asdu.save(self.form)
+        self.form.hide()
 
     def cancelSlot(self):
         self.asdu.cancel()
-        self.device = self.asdu.interfaces[self.processingObject.processingInterfaceIndex].protocols[self.processingObject.processingProtocolIndex].devices[self.processingObject.processingDeviceIndex]
-
-        for child in self.scrollAreaWidgetContents.children():
-            child.deleteLater()
-        self.settingsRender()
+        self.form.hide()
 
     def openTable(self):
         window = QWidget()
+        window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
         self.table = Mac101BalanceTablePage(window, self.processingObject)
         window.show()
         self.form.hide()

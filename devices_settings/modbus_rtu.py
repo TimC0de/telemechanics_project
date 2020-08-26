@@ -16,25 +16,27 @@ class ModbusRtuRegistersPage(modbus_rtu_registers.Ui_Form):
     def connectSlots(self):
         self.pushButton.clicked.connect(self.openSettings)
         self.pushButton_8.clicked.connect(self.openDiscrets)
-        self.save.clicked.connect(lambda: self.asdu.save(self.form))
+        self.save.clicked.connect(self.saveSlot)
         self.cancel.clicked.connect(self.cancelSlot)
+
+    def saveSlot(self):
+        self.asdu.save(self.form)
+        self.form.hide()
 
     def cancelSlot(self):
         self.asdu.cancel()
-        self.device = self.asdu.interfaces[self.processingObject.processingInterfaceIndex].protocols[self.processingObject.processingProtocolIndex].devices[self.processingObject.processingDeviceIndex]
-
-        for child in self.scrollAreaWidgetContents.children():
-            child.deleteLater()
-        self.settingsRender()
+        self.form.hide()
 
     def openSettings(self):
         window = QWidget()
+        window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
         self.settings = ModbusRtuSettingsPage(window, self.processingObject)
         window.show()
         self.form.hide()
 
     def openDiscrets(self):
         window = QWidget()
+        window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
         self.discrets = ModbusRtuDiscretsPage(window, self.processingObject)
         window.show()
         self.form.hide()
@@ -53,25 +55,27 @@ class ModbusRtuSettingsPage(modbus_rtu_settings.Ui_Form):
     def connectSlots(self):
         self.pushButton_2.clicked.connect(self.openRegisters)
         self.pushButton_4.clicked.connect(self.openDiscrets)
-        self.save.clicked.connect(lambda: self.asdu.save(self.form))
+        self.save.clicked.connect(self.saveSlot)
         self.cancel.clicked.connect(self.cancelSlot)
+
+    def saveSlot(self):
+        self.asdu.save(self.form)
+        self.form.hide()
 
     def cancelSlot(self):
         self.asdu.cancel()
-        self.device = self.asdu.interfaces[self.processingObject.processingInterfaceIndex].protocols[self.processingObject.processingProtocolIndex].devices[self.processingObject.processingDeviceIndex]
-
-        for child in self.scrollAreaWidgetContents.children():
-            child.deleteLater()
-        self.settingsRender()
+        self.form.hide()
 
     def openRegisters(self):
         window = QWidget()
+        window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
         self.registers = ModbusRtuRegistersPage(window, self.processingObject)
         window.show()
         self.form.hide()
 
     def openDiscrets(self):
         window = QWidget()
+        window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
         self.discrets = ModbusRtuDiscretsPage(window, self.processingObject)
         window.show()
         self.form.hide()
@@ -90,25 +94,27 @@ class ModbusRtuDiscretsPage(modbus_rtu_discrets.Ui_Form):
     def connectSlots(self):
         self.pushButton_2.clicked.connect(self.openRegisters)
         self.pushButton.clicked.connect(self.openSettings)
-        self.save.clicked.connect(lambda: self.asdu.save(self.form))
+        self.save.clicked.connect(self.saveSlot)
         self.cancel.clicked.connect(self.cancelSlot)
+
+    def saveSlot(self):
+        self.asdu.save(self.form)
+        self.form.hide()
 
     def cancelSlot(self):
         self.asdu.cancel()
-        self.device = self.asdu.interfaces[self.processingObject.processingInterfaceIndex].protocols[self.processingObject.processingProtocolIndex].devices[self.processingObject.processingDeviceIndex]
-
-        for child in self.scrollAreaWidgetContents.children():
-            child.deleteLater()
-        self.settingsRender()
+        self.form.hide()
 
     def openRegisters(self):
         window = QWidget()
+        window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
         self.registers = ModbusRtuRegistersPage(window, self.processingObject)
         window.show()
         self.form.hide()
 
     def openSettings(self):
         window = QWidget()
+        window.setGeometry(self.form.rect().x(), self.form.rect().y(), self.form.rect().width(), self.form.rect().height())
         self.settings = ModbusRtuSettingsPage(window, self.processingObject)
         window.show()
         self.form.hide()

@@ -11,3 +11,10 @@ class TelemechanicsData:
     def forceSave(self):
         with open('./config/telemechanics.yaml', "w", encoding="utf-16") as file:
             yaml.dump(self, stream=file, allow_unicode=True)
+
+    def cancel(self):
+        with open('./config/telemechanics.yaml', "r", encoding="utf-16") as file:
+            td = yaml.load(stream=file)
+            self._deviceTypes = td._deviceTypes
+            self.asduNames = td.asduNames
+            self.tcpClients = td.tcpClients

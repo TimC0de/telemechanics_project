@@ -21,16 +21,12 @@ def ASDUTcpClientsGenerate():
     tcpClients = list()
     for tcpClientIndex in range(4):
         name = u"TCP клиент %d" % (tcpClientIndex + 1)
-        ip = "192.168.0.%d" % (tcpClientIndex)
-        tcpClients.append(TcpClient(name, True, ip, "8080", "3", u"МЭК-104"))
+        tcpClients.append(TcpClient(name, True, "", "", "", u"МЭК-104", {'column_1': 'Параметры', 'column_2': 'Адрес', 'column_3': 'Период, c', 'column_4': 'Спорадическая', 'column_5': 'Апертура', 'column_6': 'Фоновое сканирование', 'column_7': 'Команды опроса'}, {'rowsCount': 12, 'columnCount': 7}))
     return tcpClients
 
 def ProtocolDevicesGenerate(protocol):
     devices = list()
-    for deviceName in [u"ТС-12", u"ТС-32", u"Пользовательское устройство"]:
-        devices.append(Device(deviceName, True, ""))
-    
-    for deviceIndex in range(4, 31):
+    for deviceIndex in range(1, 31):
         devices.append(Device(u"Устройство %d" % (deviceIndex), False, ""))
     return devices
 
@@ -55,12 +51,12 @@ def ASDUInterfacesGenerate():
     return interfaces
 
 def ASDUGenerate(asduIndex):
-    bridgesQty = random.randrange(4)
-    ethernetQty = 6 - bridgesQty * 2
-    canQty = 4
-    rs232Qty = 6
-    rs485Qty = 5
-    asdu = Asdu(u"УСПД %d" % (asduIndex), random.randrange(6), bridgesQty, ethernetQty, rs485Qty, rs232Qty, canQty, ASDUInterfacesGenerate(), ASDUEthernetsGenerate(bridgesQty, ethernetQty))
+    bridgesQty = 0
+    ethernetQty = 2
+    canQty = 0
+    rs232Qty = 0
+    rs485Qty = 3
+    asdu = Asdu(u"УСПД (Тест)", random.randrange(6), bridgesQty, ethernetQty, rs485Qty, rs232Qty, canQty, ASDUInterfacesGenerate(), ASDUEthernetsGenerate(bridgesQty, ethernetQty))
     with open(asdu.path, "w", encoding="utf-16") as file:
         yaml.dump(asdu, stream=file, allow_unicode=True)
     
@@ -74,7 +70,7 @@ def TelemechanicsGenerate(asdusQty = 1):
 
 def createYAML():
     with open("./config/telemechanics.yaml", "w", encoding="utf-16") as file:
-        td = TelemechanicsGenerate(3)
+        td = TelemechanicsGenerate()
         yaml.dump(td, stream=file, allow_unicode=True)
     return td
 

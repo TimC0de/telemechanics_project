@@ -8,7 +8,8 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from PyQt5.QtGui import QIntValidator, QRegExpValidator
+from PyQt5.QtCore import QRegExp
 
 class Ui_Form(object):
     def setupUi(self, Form, processingObject):
@@ -17,13 +18,15 @@ class Ui_Form(object):
         self.device = self.asdu.interfaces[processingObject.processingInterfaceIndex].protocols[processingObject.processingProtocolIndex].devices[processingObject.processingDeviceIndex]
 
         Form.setObjectName("Form")
-        Form.resize(1366, 768)
+        
         font = QtGui.QFont()
         font.setPointSize(8)
         Form.setFont(font)
         Form.setStyleSheet("QWidget {\n"
 "    background-color: white;\n"
 "}")
+        Form.resizeEvent = lambda event: self.resizeEvent(event)
+        Form.closeEvent = lambda event: self.closeEvent(event, self.asdu)
         self.form = Form
         self.frame_8 = QtWidgets.QFrame(Form)
         self.frame_8.setGeometry(QtCore.QRect(0, 0, 1357, 40))
@@ -56,12 +59,28 @@ class Ui_Form(object):
         self.pushButton_8.setObjectName("pushButton_8")
         self.pushButton_8.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.scrollArea = QtWidgets.QScrollArea(Form)
-        self.scrollArea.setGeometry(QtCore.QRect(0, 40, 1366, 728))
+        self.scrollArea.setGeometry(QtCore.QRect(0, 100, self.form.rect().width(), self.form.rect().height() - 100))
         self.scrollArea.setMinimumSize(QtCore.QSize(1366, 728))
         self.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.scrollArea.setStyleSheet("QScrollArea { border: none; }")
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
+        self.save = QtWidgets.QPushButton(Form)
+        self.save.setGeometry(QtCore.QRect(1000, 50, 155, 35))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.save.setFont(font)
+        self.save.setStyleSheet("QPushButton { border-radius: 5px; background-color: #FED2AA; }")
+        self.save.setObjectName("save")
+        self.save.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.cancel = QtWidgets.QPushButton(Form)
+        self.cancel.setGeometry(QtCore.QRect(800, 50, 155, 35))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.cancel.setFont(font)
+        self.cancel.setStyleSheet("QPushButton { border-radius: 5px; background-color: #C4C4C4; }")
+        self.cancel.setObjectName("cancel")
+        self.cancel.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.settingsRender()
 
         self.retranslateUi(Form)
@@ -70,7 +89,7 @@ class Ui_Form(object):
     def settingsRender(self):
         _translate = QtCore.QCoreApplication.translate
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 1366, 728))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, self.form.rect().width(), self.form.rect().height() - 100))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -80,7 +99,7 @@ class Ui_Form(object):
         self.groupBox.setFlat(True)
         self.groupBox.setObjectName("groupBox")
         self.frame_9 = QtWidgets.QFrame(self.groupBox)
-        self.frame_9.setGeometry(QtCore.QRect(40, 67, 380, 205))
+        self.frame_9.setGeometry(QtCore.QRect(40, 27, 380, 205))
         self.frame_9.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_9.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_9.setObjectName("frame_9")
@@ -132,24 +151,9 @@ class Ui_Form(object):
         self.startingAddress.setFont(font)
         self.startingAddress.setStyleSheet("QLineEdit { border: 1px solid #999; }")
         self.startingAddress.setObjectName("startingAddress")
-        self.save = QtWidgets.QPushButton(self.groupBox)
-        self.save.setGeometry(QtCore.QRect(1000, 67, 155, 35))
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        self.save.setFont(font)
-        self.save.setStyleSheet("QPushButton { border-radius: 5px; background-color: #FED2AA; }")
-        self.save.setObjectName("save")
-        self.save.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.cancel = QtWidgets.QPushButton(self.groupBox)
-        self.cancel.setGeometry(QtCore.QRect(800, 67, 155, 35))
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        self.cancel.setFont(font)
-        self.cancel.setStyleSheet("QPushButton { border-radius: 5px; background-color: #C4C4C4; }")
-        self.cancel.setObjectName("cancel")
-        self.cancel.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.startingAddress.setValidator(QIntValidator(self.frame_16))
         self.tableWidget = QtWidgets.QTableWidget(self.groupBox)
-        self.tableWidget.setGeometry(QtCore.QRect(40, 310, 602, 632))
+        self.tableWidget.setGeometry(QtCore.QRect(40, 270, 602, 632))
         self.tableWidget.setStyleSheet("QTableWidget { border: 1px solid #777; }\n"
 "QTableWidget QHeaderView { border: none; }\n"
 "QTableWidget, QTableWidget QHeaderView:section, QTableWidget QHeaderView {\n"
@@ -160,55 +164,23 @@ class Ui_Form(object):
         self.tableWidget.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerItem)
         self.tableWidget.setShowGrid(True)
         self.tableWidget.setWordWrap(True)
-        self.tableWidget.setRowCount(20)
-        self.tableWidget.setColumnCount(4)
+        self.tableWidget.setRowCount(int(self.device.data["registers"]["rowsCount"]))
+        self.tableWidget.setColumnCount(int(self.device.data["registers"]["columnCount"]))
         self.tableWidget.setObjectName("tableWidget")
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(2, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(3, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(4, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(5, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(6, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(7, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(8, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(9, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(10, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(11, item)
-        item = QtWidgets.QTableWidgetItem()
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        item.setFont(font)
-        self.tableWidget.setHorizontalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        item.setFont(font)
-        item.setBackground(QtGui.QColor(0, 0, 0, 0))
-        self.tableWidget.setHorizontalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        item.setFont(font)
-        item.setBackground(QtGui.QColor(0, 0, 0, 0))
-        self.tableWidget.setHorizontalHeaderItem(2, item)
-        item = QtWidgets.QTableWidgetItem()
-        font = QtGui.QFont()
-        font.setPointSize(11)
-        item.setFont(font)
-        self.tableWidget.setHorizontalHeaderItem(3, item)
+
+        for i in range(int(self.device.data["registers"]["rowsCount"])):
+            item = QtWidgets.QTableWidgetItem()
+            self.tableWidget.setVerticalHeaderItem(i, item)
+        
+        for i in range(int(self.device.data["registers"]["columnCount"])):
+            item = QtWidgets.QTableWidgetItem()
+            font = QtGui.QFont()
+            font.setPointSize(11)
+            item.setFont(font)
+            if "column_%d" % (i + 1) in self.device.data["registers"]:
+                item.setText(_translate("Form", self.device.columnNames["registers"]["column_%d" % (i + 1)]))
+            self.tableWidget.setHorizontalHeaderItem(i, item)
+        
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(False)
         self.tableWidget.horizontalHeader().setDefaultSectionSize(150)
         self.tableWidget.horizontalHeader().setHighlightSections(False)
@@ -216,15 +188,17 @@ class Ui_Form(object):
         self.tableWidget.horizontalHeader().setStretchLastSection(False)
         self.tableWidget.verticalHeader().setVisible(False)
 
-        for i in range(12):
-            for j in range(4):
+        for i in range(int(self.device.data["registers"]["columnCount"])):
+            for j in range(int(self.device.data["registers"]["rowsCount"])):
                 item = QtWidgets.QTableWidgetItem()
                 font = QtGui.QFont()
                 font.setPointSize(11)
                 item.setFont(font)
                 item.setBackground(QtGui.QColor(0, 0, 0, 0))
-                item.setText(self.device.settings.get("table_registers_%d%d" % (i, j)))
-                self.tableWidget.setItem(i, j, item)
+                if "column_%d" % (i + 1) in self.device.data["registers"]:
+                    item.setText(self.device.data["registers"]["column_%d" % (i + 1)].get("row_%d" % (j + 1)))
+                
+                self.tableWidget.setItem(j, i, item)
         self.tableWidget.itemChanged.connect(self.updateDeviceTableSetting)
         
         # self.frame_3 = QtWidgets.QFrame(self.groupBox)
@@ -272,38 +246,6 @@ class Ui_Form(object):
         self.label.setText(_translate("Form", "Порядок байт float, int32"))
         self.label_15.setText(_translate("Form", "Начальный адрес:"))
         self.save.setText(_translate("Form", "Сохранить"))
-        item = self.tableWidget.verticalHeaderItem(0)
-        item.setText(_translate("Form", "1"))
-        item = self.tableWidget.verticalHeaderItem(1)
-        item.setText(_translate("Form", "2"))
-        item = self.tableWidget.verticalHeaderItem(2)
-        item.setText(_translate("Form", "3"))
-        item = self.tableWidget.verticalHeaderItem(3)
-        item.setText(_translate("Form", "4"))
-        item = self.tableWidget.verticalHeaderItem(4)
-        item.setText(_translate("Form", "5"))
-        item = self.tableWidget.verticalHeaderItem(5)
-        item.setText(_translate("Form", "6"))
-        item = self.tableWidget.verticalHeaderItem(6)
-        item.setText(_translate("Form", "7"))
-        item = self.tableWidget.verticalHeaderItem(7)
-        item.setText(_translate("Form", "8"))
-        item = self.tableWidget.verticalHeaderItem(8)
-        item.setText(_translate("Form", "9"))
-        item = self.tableWidget.verticalHeaderItem(9)
-        item.setText(_translate("Form", "10"))
-        item = self.tableWidget.verticalHeaderItem(10)
-        item.setText(_translate("Form", "11"))
-        item = self.tableWidget.verticalHeaderItem(11)
-        item.setText(_translate("Form", "12"))
-        item = self.tableWidget.horizontalHeaderItem(0)
-        item.setText(_translate("Form", "Адрес"))
-        item = self.tableWidget.horizontalHeaderItem(1)
-        item.setText(_translate("Form", "Параметр"))
-        item = self.tableWidget.horizontalHeaderItem(2)
-        item.setText(_translate("Form", "Тип"))
-        item = self.tableWidget.horizontalHeaderItem(3)
-        item.setText(_translate("Form", "Длина"))
         # self.pushButton_4.setText(_translate("Form", "Добавить"))
         # self.pushButton_7.setText(_translate("Form", "Удалить"))
         # self.pushButton_5.setText(_translate("Form", "Создать дубликат"))
@@ -319,6 +261,13 @@ class Ui_Form(object):
         self.startingAddress.setText(self.device.settings.get("registers_startingAddress"))
         self.startingAddress.editingFinished.connect(lambda: self.updateDeviceText("startingAddress", "registers_startingAddress"))
 
+    def closeEvent(self, event, obj):
+        obj.cancel()
+
+    def resizeEvent(self, event):
+        self.scrollArea.setGeometry(QtCore.QRect(0, 100, self.form.rect().width(), self.form.rect().height() - 100))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, self.form.rect().width(), self.form.rect().height() - 100))
+
     def updateDeviceText(self, button, prop):
         self.device.settings[prop] = getattr(self, button).text()
 
@@ -328,7 +277,10 @@ class Ui_Form(object):
     def updateDeviceTableSetting(self, item):
         i = item.row()
         j = item.column()
-        self.device.settings["table_registers_%d%d" % (i, j)] = item.text()
+        if not "column_%d" % (j + 1) in self.device.data["registers"]:
+            self.device.data["registers"]["column_%d" % j] = dict()
+        
+        self.device.data["registers"]["column_%d" % (j + 1)]["row_%d" % (i + 1)] = item.text()
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
